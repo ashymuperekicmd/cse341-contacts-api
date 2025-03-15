@@ -6,7 +6,7 @@ info:
 servers:
   - url: http://localhost:3000
     description: Local server
-  - url: https://your-render-url.onrender.com
+  - url: cse341-contacts-api-rj5n.onrender.com
     description: Production server
 paths:
   /contacts:
