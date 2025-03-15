@@ -1,45 +1,39 @@
 const express = require('express');
+const mongoose = require('mongoose');
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('yamljs');
+require('dotenv').config();
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const mongoose = require('mongoose');
-require('dotenv').config();
-
-// Import the Contact model
-const Contact = require('./models/contact');
+// Import routes
+const contactsRouter = require('./routes/contacts');
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.error('Could not connect to MongoDB', err));
 
-// Middleware to parse JSON requests
+// Middleware
 app.use(express.json());
+
+// Serve Swagger UI
+const swaggerDocument = YAML.load('./swagger.yaml');
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+// Routes
+app.use('/contacts', contactsRouter);
 
 // Root route
 app.get('/', (req, res) => {
   res.send('Hello World..');
 });
 
-// GET all contacts
-app.get('/contacts', async (req, res) => {
-  try {
-    const contacts = await Contact.find();
-    res.json(contacts);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-// GET a single contact by ID
-app.get('/contacts/:id', async (req, res) => {
-  try {
-    const contact = await Contact.findById(req.params.id);
-    if (!contact) return res.status(404).json({ message: 'Contact not found' });
-    res.json(contact);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: 'Something went wrong!' });
 });
 
 // Start the server
