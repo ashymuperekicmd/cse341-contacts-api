@@ -1,16 +1,27 @@
-// Import Express
 const express = require('express');
+const mongodb = require('./data/database');
 
-// Create Express app
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
-// Define a route
-app.get('/', (req, res) => {
-  res.send('Hello World');
-});
+// Verify dotenv is configured at the very top
+require('dotenv').config();
 
-// Start the server
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Routes
+app.use('/', require('./routes'));
+
+// Initialize database
+mongodb.initDb((err) => {
+    if (err) {
+        console.error('Failed to initialize database:', err);
+        process.exit(1);
+    } else {
+        app.listen(port, () => {
+            console.log(`Server running on port ${port}`);
+        });
+    }
 });

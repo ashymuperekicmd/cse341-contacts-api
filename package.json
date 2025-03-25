@@ -18,6 +18,8 @@
   "homepage": "https://github.com/ashymuperekicmd/cse341-contacts-api#readme",
   "description": "",
   "dependencies": {
-    "express": "^4.21.2"
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mongo": "^0.1.0"
   }
 }
